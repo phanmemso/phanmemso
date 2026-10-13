@@ -1,0 +1,43 @@
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+}
+
+/*page login nằm giữa màn hình*/
+.page-login {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  flex-direction: row;
+  background-color: rgb(255, 255, 255);
+}
+.form-login {
+  background-color: rgb(255, 255, 255);
+  padding: 20px 70px 20px 70px;
+  border: 5px solid white;
+  border-radius: 5px;
+  /* box-shadow: 10px 10px 10px rgb(46, 45, 45); */
+}
+
+.page-app {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  flex-direction: row;
+  background-color: rgb(122, 33, 33);
+}
+
+.login-title {
+  font-family: "Nunito", sans-serif;
+  font-size: 50px;
+  font-weight: 900;
+  text-align: center;
+  margin-bottom: 15px;
+  color: red;
+}
