@@ -788,14 +788,34 @@ textarea {
   }
 }
 
-/* Ngăn Safari trên iPhone tự zoom khi nhập liệu */
+/* Font chữ dùng chung cho 3 ô dữ liệu */
+.data-textarea,
+.data-textarea.ant-input,
+.input-textarea,
+.input-textarea.ant-input {
+  font-family: Arial, "Helvetica Neue", sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 500;
+  line-height: 1.7;
+  letter-spacing: 0.3px;
+  color: #222 !important;
+}
+
+/* Nội dung gợi ý khi ô chưa có dữ liệu */
+.data-textarea::placeholder,
+.input-textarea::placeholder {
+  color: #999 !important;
+  font-weight: 400;
+  opacity: 1;
+}
+
+/* Giữ chữ đủ lớn trên iPhone, tránh tự động zoom khi nhập */
 @media screen and (max-width: 767px) {
   .data-textarea,
   .data-textarea.ant-input,
   .input-textarea,
-  input,
-  textarea,
-  select {
+  .input-textarea.ant-input {
     font-size: 16px !important;
+    line-height: 1.7;
   }
 }
