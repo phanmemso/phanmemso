@@ -787,3 +787,15 @@ textarea {
     gap: 7px;
   }
 }
+
+/* Ngăn Safari trên iPhone tự zoom khi nhập liệu */
+@media screen and (max-width: 767px) {
+  .data-textarea,
+  .data-textarea.ant-input,
+  .input-textarea,
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}

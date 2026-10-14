@@ -158,7 +158,8 @@ function App() {
         <Menu
           mode="inline"
           items={menuItems}
-          onClick={({ key }) => {
+          // eslint-disable-next-line no-empty-pattern
+          onClick={({}) => {
             setOpen(false);
             // Thêm xử lý điều hướng theo key nếu cần.
           }}
