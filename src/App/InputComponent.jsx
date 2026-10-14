@@ -63,14 +63,14 @@ function InputComponent({ onTinhToan, offShowKetQua }) {
         <Button onClick={handleTinhToan}>Tính toán</Button>
       </div>
 
-      <div className="input-box">
+      {/* <div className="input-box">
         <Input.TextArea
           rows={10}
           value={data}
           placeholder="Nhập dữ liệu..."
           onChange={(e) => setData(e.target.value)}
         />
-      </div>
+      </div> */}
 
       <div className="add-button-container">
         <Button

@@ -77,11 +77,11 @@ function App() {
           offShowKetQua={() => setShowResult(false)}
         />
 
-        {showResult && (
+        {/* {showResult && (
           <div className="result-container">
             <ResultTable />
           </div>
-        )}
+        )} */}
       </Content>
 
       <Drawer
