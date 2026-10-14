@@ -78,7 +78,7 @@ function Login() {
         </Form.Item>
         <div className="register-guide">
           <span onClick={() => navigate("/huong-dan-dang-ky")}>
-            Hướng dẫn đăng ký
+            Hướng dẫn đăng ký v1.0
           </span>
         </div>
         <Button color="red" variant="solid" htmlType="submit" block>
