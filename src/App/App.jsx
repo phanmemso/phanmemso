@@ -60,7 +60,7 @@ function App() {
           aria-label="Mở menu"
         />
 
-        <div className="app-logo">ssv123</div>
+        <div className="app-logo">pro399</div>
 
         <Menu className="desktop-menu" mode="horizontal" items={menuItems} />
 
@@ -75,6 +75,14 @@ function App() {
       </Header>
 
       <Content className="app-content">
+        <InputComponent
+          onTinhToan={() => setShowResult(true)}
+          offShowKetQua={() => setShowResult(false)}
+        />
+        <InputComponent
+          onTinhToan={() => setShowResult(true)}
+          offShowKetQua={() => setShowResult(false)}
+        />
         <InputComponent
           onTinhToan={() => setShowResult(true)}
           offShowKetQua={() => setShowResult(false)}
