@@ -220,7 +220,9 @@ function Login() {
           </Form.Item>
         </Form>
 
-        <div className="login-footer">© {new Date().getFullYear()} pro399</div>
+        <div className="login-footer">
+          © {new Date().getFullYear()} pro399 v1.1
+        </div>
       </div>
     </div>
   );

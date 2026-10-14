@@ -1,182 +1,266 @@
 import { useState } from "react";
-import { Layout, Drawer, Button, Menu, Input, message } from "antd";
+import { Layout, Drawer, Button, Menu, message } from "antd";
 import {
   MenuOutlined,
+  ReloadOutlined,
   CopyOutlined,
+  FileTextOutlined,
+  CheckCircleOutlined,
+  CalculatorOutlined,
+  BarChartOutlined,
   TeamOutlined,
   TrophyOutlined,
-  BarChartOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
+
 import "./App.css";
 
 const { Header, Content } = Layout;
-const { TextArea } = Input;
 
 function App() {
   const [open, setOpen] = useState(false);
+
   const [inputText, setInputText] = useState("");
   const [returnedText, setReturnedText] = useState("");
   const [remainingText, setRemainingText] = useState("");
 
   const menuItems = [
-    { key: "khach", icon: <TeamOutlined />, label: "Danh mục khách" },
-    { key: "ketqua", icon: <TrophyOutlined />, label: "Kết quả" },
-    { key: "baocao", icon: <BarChartOutlined />, label: "Báo cáo tổng" },
-    { key: "tuychinh", icon: <SettingOutlined />, label: "Tùy chỉnh" },
+    {
+      key: "danh-muc-khach",
+      icon: <TeamOutlined />,
+      label: "Danh mục khách",
+    },
+    {
+      key: "ket-qua-xo-so",
+      icon: <TrophyOutlined />,
+      label: "Kết quả xổ số",
+    },
+    {
+      key: "bao-cao-tong",
+      icon: <BarChartOutlined />,
+      label: "Báo cáo tổng",
+    },
+    {
+      key: "tuy-chinh",
+      icon: <SettingOutlined />,
+      label: "Tùy chỉnh",
+    },
   ];
 
-  const handleCopy = async (text, label) => {
-    if (!text.trim()) {
-      message.warning(`${label} đang trống`);
+  // Làm mới riêng ô Nhập vào
+  const handleResetInput = () => {
+    setInputText("");
+    message.success("Đã làm mới nội dung nhập");
+  };
+
+  // Sao chép nội dung
+  const handleCopy = async (text) => {
+    if (!text) {
+      message.warning("Không có nội dung để sao chép");
       return;
     }
 
     try {
       await navigator.clipboard.writeText(text);
-      message.success(`Đã sao chép ${label}`);
+      message.success("Đã sao chép");
     } catch {
-      message.error(
-        "Không thể sao chép. Hãy mở website bằng HTTPS hoặc localhost.",
-      );
+      message.error("Không thể sao chép nội dung");
     }
   };
 
+  // Xử lý khi nhấn Duyệt tin
   const handleDuyetTin = () => {
     if (!inputText.trim()) {
-      message.warning("Vui lòng nhập dữ liệu!");
+      message.warning("Vui lòng nhập dữ liệu trước");
       return;
     }
 
-    // Nối hàm duyệt tin hiện có của bạn tại đây.
+    // TODO: Gọi hàm xử lý dữ liệu hiện có của bạn tại đây.
     message.success("Đã nhận dữ liệu để duyệt");
   };
 
+  // Xử lý khi nhấn Tính toán
   const handleTinhToan = () => {
     if (!inputText.trim()) {
-      message.warning("Vui lòng nhập dữ liệu!");
+      message.warning("Vui lòng nhập dữ liệu trước");
       return;
     }
 
-    // TODO: Gọi hàm xử lý dữ liệu hiện có tại đây.
-    // Ví dụ: lấy kết quả xử lý và cập nhật:
-    // setReturnedText(ketQua);
-    // setRemainingText(conLai);
-
-    message.info("Hãy nối hàm tính toán hiện có vào handleTinhToan");
+    // TODO: Gọi hàm tính toán hiện có của bạn tại đây.
+    // Cập nhật returnedText và remainingText từ kết quả thật.
+    message.success("Đã nhận yêu cầu tính toán");
   };
 
-  const handleThemMoi = () => {
-    setInputText("");
-    setReturnedText("");
-    setRemainingText("");
-    message.success("Đã làm mới dữ liệu");
-  };
+  // Tạo khung kết quả dùng chung
+  const renderResultPanel = ({
+    title,
+    subtitle,
+    value,
+    onChange,
+    icon,
+    placeholder,
+  }) => (
+    <section className="data-panel">
+      <div className="panel-header">
+        <div className="panel-icon">{icon}</div>
+
+        <div className="panel-title-group">
+          <h3 className="panel-title">{title}</h3>
+          <p className="panel-subtitle">{subtitle}</p>
+        </div>
+
+        <button
+          type="button"
+          className="copy-button"
+          onClick={() => handleCopy(value)}
+        >
+          <CopyOutlined />
+          <span>Sao chép</span>
+        </button>
+      </div>
+
+      <textarea
+        className="data-textarea"
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        placeholder={placeholder}
+        rows={4}
+      />
+    </section>
+  );
 
   return (
     <Layout className="app-layout">
+      {/* HEADER */}
       <Header className="app-header">
         <Button
           className="menu-button"
           type="text"
           icon={<MenuOutlined />}
           onClick={() => setOpen(true)}
-          aria-label="Mở menu"
         />
 
-        <div className="app-logo">pro399</div>
+        <div className="app-brand">
+          <div className="app-logo">pro399</div>
+          <div className="brand-divider" />
+          <div className="header-title">Nhanh - Gọn - Chính xác</div>
+        </div>
       </Header>
 
-      <Content className="app-content">
-        <div className="workspace">
-          <div className="action-row">
-            <Button type="primary" onClick={handleDuyetTin}>
-              Button 1
-            </Button>
-
-            <Button onClick={handleTinhToan}>Button 2</Button>
-
-            <Button className="clear-button" onClick={handleThemMoi}>
-              Làm mới
-            </Button>
-          </div>
-
-          <section className="data-panel input-panel">
-            <div className="panel-heading">Nhập vào</div>
-
-            <TextArea
-              className="data-textarea"
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              placeholder="Nhập dữ liệu tại đây..."
-              autoSize={{ minRows: 6, maxRows: 16 }}
-            />
-
-            <Button
-              className="copy-button"
-              icon={<CopyOutlined />}
-              onClick={() => handleCopy(inputText, "nội dung nhập")}
-            >
-              Sao chép
-            </Button>
-          </section>
-
-          <section className="data-panel">
-            <div className="panel-heading">Trả về</div>
-
-            <TextArea
-              className="data-textarea"
-              value={returnedText}
-              onChange={(e) => setReturnedText(e.target.value)}
-              placeholder="Kết quả sẽ hiển thị tại đây..."
-              autoSize={{ minRows: 5, maxRows: 16 }}
-            />
-
-            <Button
-              className="copy-button"
-              icon={<CopyOutlined />}
-              onClick={() => handleCopy(returnedText, "kết quả trả về")}
-            >
-              Sao chép
-            </Button>
-          </section>
-
-          <section className="data-panel">
-            <div className="panel-heading">Còn lại</div>
-
-            <TextArea
-              className="data-textarea"
-              value={remainingText}
-              onChange={(e) => setRemainingText(e.target.value)}
-              placeholder="Dữ liệu còn lại sẽ hiển thị tại đây..."
-              autoSize={{ minRows: 4, maxRows: 16 }}
-            />
-
-            <Button
-              className="copy-button"
-              icon={<CopyOutlined />}
-              onClick={() => handleCopy(remainingText, "dữ liệu còn lại")}
-            >
-              Sao chép
-            </Button>
-          </section>
-        </div>
-      </Content>
-
+      {/* MENU */}
       <Drawer
-        title="Menu"
+        title="Menu hệ thống"
         placement="left"
         open={open}
         onClose={() => setOpen(false)}
-        size={300}
-        styles={{ wrapper: { maxWidth: "85vw" } }}
+        size="default"
       >
         <Menu
-          mode="vertical"
+          mode="inline"
           items={menuItems}
-          onClick={() => setOpen(false)}
+          onClick={({ key }) => {
+            setOpen(false);
+            // Thêm xử lý điều hướng theo key nếu cần.
+          }}
         />
       </Drawer>
+
+      {/* NỘI DUNG */}
+      <Content className="app-content">
+        <main className="workspace">
+          <section className="welcome-section">
+            <div></div>
+          </section>
+
+          <div className="dashboard-grid">
+            {/* KHUNG NHẬP VÀO */}
+            <section className="data-panel input-panel">
+              <div className="panel-header">
+                <div className="panel-icon">
+                  <FileTextOutlined />
+                </div>
+
+                <div className="panel-title-group">
+                  <h3 className="panel-title">Nhập dữ liệu</h3>
+                  <p className="panel-subtitle">Nhập dữ liệu cần xử lý</p>
+                </div>
+
+                {/* LÀM MỚI Ở BÊN TRÁI SAO CHÉP */}
+                <div className="panel-header-actions">
+                  <button
+                    type="button"
+                    className="copy-button"
+                    onClick={handleResetInput}
+                  >
+                    <ReloadOutlined />
+                    <span>Làm mới</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="copy-button"
+                    onClick={() => handleCopy(inputText)}
+                  >
+                    <CopyOutlined />
+                    <span>Sao chép</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="action-row">
+                <button
+                  type="button"
+                  className="action-button review-button"
+                  onClick={handleDuyetTin}
+                >
+                  <CheckCircleOutlined />
+                  <span>Duyệt tin</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="action-button calculate-button"
+                  onClick={handleTinhToan}
+                >
+                  <CalculatorOutlined />
+                  <span>Tính toán</span>
+                </button>
+              </div>
+
+              <textarea
+                className="data-textarea input-textarea"
+                value={inputText}
+                onChange={(event) => setInputText(event.target.value)}
+                placeholder="Nhập dữ liệu..."
+                rows={10}
+              />
+            </section>
+
+            {/* CỘT KẾT QUẢ */}
+            <div className="result-column">
+              {renderResultPanel({
+                title: "Gửi đi",
+                subtitle: "Kết quả đã được xử lý",
+                value: returnedText,
+                onChange: setReturnedText,
+                icon: <CheckCircleOutlined />,
+                placeholder: "Kết quả sẽ hiển thị ở đây...",
+              })}
+
+              {renderResultPanel({
+                title: "Còn thừa",
+                subtitle: "Dữ liệu còn lại sau xử lý",
+                value: remainingText,
+                onChange: setRemainingText,
+                icon: <BarChartOutlined />,
+                placeholder: "Dữ liệu còn thừa sẽ hiển thị ở đây...",
+              })}
+            </div>
+          </div>
+
+          <footer className="app-footer">© Pro399 - Hệ thống quản lý</footer>
+        </main>
+      </Content>
     </Layout>
   );
 }
