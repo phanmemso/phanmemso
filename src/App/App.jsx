@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Layout, Drawer, Button, Menu, message } from "antd";
+import { Layout, Drawer, Button, Menu, message, Modal } from "antd";
 import {
   MenuOutlined,
   ReloadOutlined,
@@ -14,6 +14,10 @@ import {
 } from "@ant-design/icons";
 
 import "./App.css";
+import TinhToan from "../Module/md_TinhToan";
+import dinhMuc from "../Module/md_dinhMuc";
+import truDinhMuc from "../Module/md_truDinhMuc";
+import ThongKeTable from "../components/ThongKeTable";
 
 const { Header, Content } = Layout;
 
@@ -23,6 +27,10 @@ function App() {
   const [inputText, setInputText] = useState("");
   const [returnedText, setReturnedText] = useState("");
   const [remainingText, setRemainingText] = useState("");
+
+  const [thongKeData, setThongKeData] = useState([]);
+  const [thongKeTitle, setThongKeTitle] = useState("");
+  const [openThongKe, setOpenThongKe] = useState(false);
 
   const menuItems = [
     {
@@ -47,15 +55,13 @@ function App() {
     },
   ];
 
-  // Làm mới riêng ô Nhập vào
   const handleResetInput = () => {
     setInputText("");
     message.success("Đã làm mới nội dung nhập");
   };
 
-  // Sao chép nội dung
   const handleCopy = async (text) => {
-    if (!text) {
+    if (!text?.trim()) {
       message.warning("Không có nội dung để sao chép");
       return;
     }
@@ -68,30 +74,67 @@ function App() {
     }
   };
 
-  // Xử lý khi nhấn Duyệt tin
   const handleDuyetTin = () => {
     if (!inputText.trim()) {
       message.warning("Vui lòng nhập dữ liệu trước");
       return;
     }
 
-    // TODO: Gọi hàm xử lý dữ liệu hiện có của bạn tại đây.
+    console.log(inputText);
     message.success("Đã nhận dữ liệu để duyệt");
   };
 
-  // Xử lý khi nhấn Tính toán
+  // Dùng chung cho cả 3 nút Thống kê
+  const handleThongKe = (text, title) => {
+    if (!text?.trim()) {
+      message.warning("Không có dữ liệu để thống kê");
+      return;
+    }
+
+    try {
+      const kq = TinhToan(text);
+
+      setThongKeData(kq);
+      setThongKeTitle(title);
+      setOpenThongKe(true);
+    } catch (error) {
+      console.error("Lỗi thống kê:", error);
+      message.error("Thống kê thất bại. Vui lòng kiểm tra dữ liệu.");
+    }
+  };
+
   const handleTinhToan = () => {
     if (!inputText.trim()) {
       message.warning("Vui lòng nhập dữ liệu trước");
       return;
     }
 
-    // TODO: Gọi hàm tính toán hiện có của bạn tại đây.
-    // Cập nhật returnedText và remainingText từ kết quả thật.
-    message.success("Đã nhận yêu cầu tính toán");
+    try {
+      const kq = TinhToan(inputText);
+      const kqtv = truDinhMuc(kq, dinhMuc);
+
+      setReturnedText(ketQuaSauKhiTruDinhMuc(kqtv.guiDi));
+      setRemainingText(ketQuaSauKhiTruDinhMuc(kqtv.conLai));
+
+      message.success("Tính toán thành công");
+    } catch (error) {
+      console.error("Lỗi tính toán:", error);
+      message.error("Tính toán thất bại. Vui lòng kiểm tra dữ liệu.");
+    }
   };
 
-  // Tạo khung kết quả dùng chung
+  function ketQuaSauKhiTruDinhMuc(data = []) {
+    return data
+      .map((item) => {
+        const sodanh = Array.isArray(item.sodanh)
+          ? item.sodanh.join(" ")
+          : String(item.sodanh ?? "");
+
+        return `${item.kieudanh} ${sodanh} x${item.sotien}`;
+      })
+      .join(" ");
+  }
+
   const renderResultPanel = ({
     title,
     subtitle,
@@ -109,14 +152,25 @@ function App() {
           <p className="panel-subtitle">{subtitle}</p>
         </div>
 
-        <button
-          type="button"
-          className="copy-button"
-          onClick={() => handleCopy(value)}
-        >
-          <CopyOutlined />
-          <span>Sao chép</span>
-        </button>
+        <div className="panel-header-actions">
+          <button
+            type="button"
+            className="copy-button"
+            onClick={() => handleThongKe(value, title)}
+          >
+            <BarChartOutlined />
+            <span>Thống kê</span>
+          </button>
+
+          <button
+            type="button"
+            className="copy-button"
+            onClick={() => handleCopy(value)}
+          >
+            <CopyOutlined />
+            <span>Sao chép</span>
+          </button>
+        </div>
       </div>
 
       <textarea
@@ -131,7 +185,6 @@ function App() {
 
   return (
     <Layout className="app-layout">
-      {/* HEADER */}
       <Header className="app-header">
         <Button
           className="menu-button"
@@ -147,7 +200,6 @@ function App() {
         </div>
       </Header>
 
-      {/* MENU */}
       <Drawer
         title="Menu hệ thống"
         placement="left"
@@ -155,22 +207,13 @@ function App() {
         onClose={() => setOpen(false)}
         size="default"
       >
-        <Menu
-          mode="inline"
-          items={menuItems}
-          // eslint-disable-next-line no-empty-pattern
-          onClick={({}) => {
-            setOpen(false);
-            // Thêm xử lý điều hướng theo key nếu cần.
-          }}
-        />
+        <Menu mode="inline" items={menuItems} onClick={() => setOpen(false)} />
       </Drawer>
 
-      {/* NỘI DUNG */}
       <Content className="app-content">
         <main className="workspace">
           <section className="welcome-section">
-            <div></div>
+            <div />
           </section>
 
           <div className="dashboard-grid">
@@ -183,10 +226,11 @@ function App() {
 
                 <div className="panel-title-group">
                   <h3 className="panel-title">Nhập dữ liệu</h3>
-                  <p className="panel-subtitle">Nhập dữ liệu cần xử lý</p>
+                  <p className="panel-subtitle">
+                    *Làm mới sẽ xóa dữ liệu hiện tại
+                  </p>
                 </div>
 
-                {/* LÀM MỚI Ở BÊN TRÁI SAO CHÉP */}
                 <div className="panel-header-actions">
                   <button
                     type="button"
@@ -195,6 +239,14 @@ function App() {
                   >
                     <ReloadOutlined />
                     <span>Làm mới</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="copy-button"
+                    onClick={() => handleThongKe(inputText, "Nhập dữ liệu")}
+                  >
+                    <BarChartOutlined />
+                    <span>Thống kê</span>
                   </button>
 
                   <button
@@ -258,6 +310,22 @@ function App() {
               })}
             </div>
           </div>
+
+          {/* Bảng chỉ xuất hiện khi nhấn một trong 3 nút Thống kê */}
+          <Modal
+            title={`Thống kê - ${thongKeTitle}`}
+            open={openThongKe}
+            onCancel={() => setOpenThongKe(false)}
+            footer={[
+              <Button key="close" onClick={() => setOpenThongKe(false)}>
+                Đóng
+              </Button>,
+            ]}
+            width={650}
+            centered
+          >
+            <ThongKeTable data={thongKeData} />
+          </Modal>
 
           <footer className="app-footer">© Pro399 - Hệ thống quản lý</footer>
         </main>
