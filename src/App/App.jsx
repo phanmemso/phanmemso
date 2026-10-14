@@ -19,12 +19,7 @@ const { Header, Content } = Layout;
 function App() {
   const [open, setOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(dayjs());
-
-  // Ẩn bảng kết quả ban đầu
   const [showResult, setShowResult] = useState(false);
-
-  const showDrawer = () => setOpen(true);
-  const closeDrawer = () => setOpen(false);
 
   const menuItems = [
     {
@@ -56,7 +51,7 @@ function App() {
           className="mobile-menu-button"
           type="text"
           icon={<MenuOutlined />}
-          onClick={showDrawer}
+          onClick={() => setOpen(true)}
           aria-label="Mở menu"
         />
 
@@ -67,7 +62,9 @@ function App() {
         <DatePicker
           className="app-date"
           value={selectedDate}
-          onChange={setSelectedDate}
+          onChange={(date) => {
+            if (date) setSelectedDate(date);
+          }}
           format="DD/MM/YYYY"
           placeholder="Chọn ngày"
           allowClear={false}
@@ -79,17 +76,9 @@ function App() {
           onTinhToan={() => setShowResult(true)}
           offShowKetQua={() => setShowResult(false)}
         />
-        <InputComponent
-          onTinhToan={() => setShowResult(true)}
-          offShowKetQua={() => setShowResult(false)}
-        />
-        <InputComponent
-          onTinhToan={() => setShowResult(true)}
-          offShowKetQua={() => setShowResult(false)}
-        />
 
         {showResult && (
-          <div style={{ marginTop: 20 }}>
+          <div className="result-container">
             <ResultTable />
           </div>
         )}
@@ -98,7 +87,7 @@ function App() {
       <Drawer
         title="Menu"
         placement="left"
-        onClose={closeDrawer}
+        onClose={() => setOpen(false)}
         open={open}
         size={300}
         styles={{
@@ -107,7 +96,11 @@ function App() {
           },
         }}
       >
-        <Menu mode="vertical" items={menuItems} onClick={closeDrawer} />
+        <Menu
+          mode="vertical"
+          items={menuItems}
+          onClick={() => setOpen(false)}
+        />
       </Drawer>
     </Layout>
   );
