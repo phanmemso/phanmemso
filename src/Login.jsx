@@ -18,9 +18,13 @@ function Login() {
     try {
       // Demo: kiểm tra thông tin đã nhập.
       // Thay bằng API xác thực tài khoản thật khi triển khai.
-      if (values.username && values.password) {
+      if (values.username == "1" && values.password == "1") {
+        console.log(values.username);
+        console.log(values.password);
         message.success("Đăng nhập thành công!");
         navigate("/app");
+      } else {
+        message.error("Đăng nhập thất bại!");
       }
     } finally {
       setLoading(false);

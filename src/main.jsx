@@ -1,6 +1,7 @@
 import ReactDOM from "react-dom/client";
 import Login from "./Login";
 import HuongDanDangKy from "./HuongDanDangKy";
+import "antd/dist/reset.css";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import App from "./App/App";
