@@ -12,13 +12,15 @@ import {
   TrophyOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-
 import "./App.css";
 import TinhToan from "../Module/md_TinhToan";
 import dinhMuc from "../Module/md_dinhMuc";
 import truDinhMuc from "../Module/md_truDinhMuc";
 import ThongKeTable from "../components/ThongKeTable";
-
+import chuanHoaChuoi from "../Module/md_KiemLoi";
+import "../components/InputFlash.css";
+import arr_TuBiLoi from "../Module/md_baoLoi";
+import arr_KiemTraThieuSoTien from "../Module/md_baoLoi";
 const { Header, Content } = Layout;
 
 function App() {
@@ -31,6 +33,9 @@ function App() {
   const [thongKeData, setThongKeData] = useState([]);
   const [thongKeTitle, setThongKeTitle] = useState("");
   const [openThongKe, setOpenThongKe] = useState(false);
+  const [showError, setShowError] = useState(false);
+  const [dsTuBiLoi, setdsTuBiLoi] = useState([]);
+  const [btnTinhToan, setbtnTinhToan] = useState(true);
 
   const menuItems = [
     {
@@ -54,9 +59,42 @@ function App() {
       label: "Tùy chỉnh",
     },
   ];
+  // danh sach tu bi loi
+
+  // Tự tạo regex từ danh sách từ cần tìm
+  const regex = new RegExp(
+    `(${dsTuBiLoi
+      .map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+      .join("|")})`,
+    "gi",
+  );
+
+  // Tô đỏ các từ tìm thấy
+  const renderText = () => {
+    if (!showError) {
+      return inputText;
+    }
+
+    return inputText.split(regex).map((part, index) => {
+      const isError = dsTuBiLoi.some(
+        (word) => word.toLowerCase() === part.toLowerCase(),
+      );
+
+      return isError ? (
+        <span className="error-text" key={index}>
+          {part}
+        </span>
+      ) : (
+        part
+      );
+    });
+  };
 
   const handleResetInput = () => {
     setInputText("");
+    setReturnedText("");
+    setRemainingText("");
+    setShowError(false);
     message.success("Đã làm mới nội dung nhập");
   };
 
@@ -79,9 +117,25 @@ function App() {
       message.warning("Vui lòng nhập dữ liệu trước");
       return;
     }
+    //Bước 1: chuẩn hóa chuỗi, đưa chữ hoa thành chữ thường
+    const text = chuanHoaChuoi(inputText);
+    //Bước 2: kiểm tra xem có bị thiếu kiểu đánh không
+    arr_KiemTraThieuSoTien(text);
+    console.log(arr_KiemTraThieuSoTien(text));
+    setInputText(text); // cập nhật lại value cho ô nhập tin
+    setdsTuBiLoi(arr_TuBiLoi(text).arr_TuKhongHopLe);
 
-    console.log(inputText);
-    message.success("Đã nhận dữ liệu để duyệt");
+    setShowError(true); // thông báo lỗi đỏ cho người dùng sửa lỗi
+    if (arr_TuBiLoi(text).arr_TuKhongHopLe.length > 0) {
+      message.error(`${arr_TuBiLoi(text).arr_TuKhongHopLe[0]} không hợp lệ`);
+    } else if (arr_TuBiLoi(text).arr_ThieuKDThieuST.length > 0) {
+      message.error(
+        `Thiếu kiểu đánh trước hoặc sau số ${arr_TuBiLoi(text).arr_ThieuKDThieuST[0]}`,
+      );
+    } else {
+      message.success("Kiểm lỗi thành công");
+      setbtnTinhToan(!btnTinhToan);
+    }
   };
 
   // Dùng chung cho cả 3 nút Thống kê
@@ -115,8 +169,9 @@ function App() {
 
       setReturnedText(ketQuaSauKhiTruDinhMuc(kqtv.guiDi));
       setRemainingText(ketQuaSauKhiTruDinhMuc(kqtv.conLai));
-
+      console.log(kq);
       message.success("Tính toán thành công");
+      setbtnTinhToan(!btnTinhToan);
     } catch (error) {
       console.error("Lỗi tính toán:", error);
       message.error("Tính toán thất bại. Vui lòng kiểm tra dữ liệu.");
@@ -259,11 +314,10 @@ function App() {
                   </button>
                 </div>
               </div>
-
               <div className="action-row">
                 <button
                   type="button"
-                  className="action-button review-button"
+                  className="action-button review-button "
                   onClick={handleDuyetTin}
                 >
                   <CheckCircleOutlined />
@@ -274,19 +328,45 @@ function App() {
                   type="button"
                   className="action-button calculate-button"
                   onClick={handleTinhToan}
+                  disabled={btnTinhToan}
                 >
                   <CalculatorOutlined />
                   <span>Tính toán</span>
                 </button>
               </div>
-
-              <textarea
-                className="data-textarea input-textarea"
+              {/* <textarea
+                className="data-textarea input-textarea "
                 value={inputText}
                 onChange={(event) => setInputText(event.target.value)}
                 placeholder="Nhập dữ liệu..."
                 rows={10}
               />
+              <InputFlash /> */}
+              <div className="input-flash">
+                <div className="input-wrapper">
+                  <textarea
+                    className="data-textarea input-textarea"
+                    rows={10}
+                    value={inputText}
+                    onChange={(event) => {
+                      setInputText(event.target.value);
+                      setShowError(false);
+                    }}
+                    onScroll={(event) => {
+                      const overlay = event.target.nextElementSibling;
+
+                      if (overlay) {
+                        overlay.scrollTop = event.target.scrollTop;
+                        overlay.scrollLeft = event.target.scrollLeft;
+                      }
+                    }}
+                    placeholder="Nhập dữ liệu..."
+                    spellCheck={false}
+                  />
+
+                  <div className="input-overlay">{renderText()}</div>
+                </div>
+              </div>
             </section>
 
             {/* CỘT KẾT QUẢ */}
@@ -327,7 +407,9 @@ function App() {
             <ThongKeTable data={thongKeData} />
           </Modal>
 
-          <footer className="app-footer">© Pro399 - Hệ thống quản lý</footer>
+          <footer className="app-footer">
+            © Pro399 - Nhanh - Gọn -Chính xác
+          </footer>
         </main>
       </Content>
     </Layout>

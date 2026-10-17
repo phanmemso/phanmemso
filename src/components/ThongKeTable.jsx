@@ -36,7 +36,7 @@ function ThongKeTable({ data = [] }) {
 
   const columns = [
     {
-      title: "Loại đánh",
+      title: "Kiểu đánh",
       dataIndex: "lo",
       key: "lo",
       align: "center",

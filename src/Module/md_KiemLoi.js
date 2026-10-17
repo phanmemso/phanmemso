@@ -1,47 +1,38 @@
-const key_kieuDanh = ["lo", "de", "3cang", "xien", "xq"];
+import key_kieuDanh from "../components/key_kieuDanh.js";
 
-function boDauTiengViet(str) {
-  return str
+function chuanHoaChuoi(input = "") {
+  // Bước 1: Bỏ dấu tiếng Việt, chuyển chữ thường,
+  // thay ký tự đặc biệt bằng dấu cách
+  let result = String(input)
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/đ/g, "d")
-    .replace(/Đ/g, "D");
-}
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ");
 
-function chuanHoaChuoi(input) {
-  let result = boDauTiengViet(input);
+  // Bước 2: Chèn khoảng trắng bên trái chữ x
+  // Ví dụ: 190x10 -> 190 x10
+  result = result.replace(/(?<=\S)x/g, " x");
 
-  // 1. Đổi ký tự phân cách thành khoảng trắng
-  result = result.replace(/[.,/;:()|]+/g, " ");
+  // Bước 3: Chèn khoảng trắng trước và sau kiểu đánh
+  // Sắp xếp từ khóa dài đến ngắn để tránh khớp từ khóa ngắn trước
+  const danhSachKieuDanh = [...key_kieuDanh]
+    .map(String)
+    .sort((a, b) => b.length - a.length);
 
-  // 2. Tách x + số + hậu tố k/n/d
-  // x10k -> x10k
-  // x10n -> x10n
-  // x10d -> x10d
-  result = result.replace(/x\s*(\d+)\s*([knd])/gi, " x$1$2 ");
+  danhSachKieuDanh.forEach((kieudanh) => {
+    const tuKhoa = kieudanh.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-  // 3. Tách trường hợp x10de -> x10d de
-  result = result.replace(/x(\d+)d\s*de/gi, " x$1d de ");
+    const regex = new RegExp(tuKhoa, "gi");
 
-  // 4. Tách các kiểu đánh
-  key_kieuDanh.forEach((kieudanh) => {
-    const regex = new RegExp(kieudanh, "gi");
-
-    result = result.replace(regex, ` ${kieudanh} `);
+    result = result.replace(regex, (match) => ` ${match} `);
   });
 
-  // 5. Tách chữ + số
-  result = result.replace(/([a-zA-Z])(\d)/g, "$1 $2");
-
-  // 6. Ghép lại x + số + k/n/d
-  result = result.replace(/\bx\s+(\d+)\s*([knd])\b/gi, "x$1$2");
-
-  // 7. Chuẩn hóa khoảng trắng
-  result = result.replace(/\s+/g, " ").trim();
+  // Bước 4: Xóa khoảng trắng đầu/cuối
+  // và gom khoảng trắng liên tiếp
+  result = result.trim().replace(/\s+/g, " ");
 
   return result;
 }
-
-console.log(chuanHoaChuoi("LÔ 78 87 x10đề 89 x100n"));
 
 export default chuanHoaChuoi;
